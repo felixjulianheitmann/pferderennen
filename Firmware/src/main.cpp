@@ -6,19 +6,19 @@
 #include <Arduino.h>
 #include <config/globals.h>
 #include <modules/GameEngine.h>
-#include <modules/HorseDriver_ULN2003.h>
 
 // ##########################################################
-// ### Interrupt Service Routines Prototypes
+// ### Function Prototypes
 // ##########################################################
 void IsrFinish();
 void IsrStart();
+bool startButtonPressed();
+bool resetButtonPressed();
 
 // ##########################################################
 // ### Initialize program variables
 // ##########################################################
 
-auto horse = HorseDriver_ULN2003();
 auto game  = GameEngine();
 
 // Flags to signalize whether a horse is at the starting gate. Reset at race start
@@ -44,8 +44,7 @@ void setup() {
     attachInterrupt(digitalPinToInterrupt(Globals::GameControl::IntStart),  IsrStart,  FALLING);
 
     // +++ Reset Horses to start
-    horse.setVelocity(100.0f);
-    horse.reverse();
+    game.reset();
 
 }
 
@@ -55,10 +54,11 @@ void setup() {
 // ##########################################################
 void loop() {
 
-
+    if(startButtonPressed()) game.start();  // If start button is pressed, start the game
+    if(resetButtonPressed()) game.reset();  // If reset button is pressed, reset the game
 
     // iterative call to driver to trigger periodic behaviour
-    horse.loopCall();
+    game.loopCall();
 
 }
 
@@ -73,7 +73,7 @@ void IsrFinish()
 
 void IsrStart()
 {
-    for(size_t i = 0; i < Globals::GameControl::nHorses; ++i)
+    for(HorseIdx i = 0; i < Globals::GameControl::nHorses; ++i)
     {
         if(digitalRead(Globals::GameControl::horseStartTriggers[i]) == LOW)
         {
@@ -81,4 +81,20 @@ void IsrStart()
             return;
         }
     }
+}
+
+bool lastStartButtonState = false;
+bool startButtonPressed()
+{
+    bool buttonPressed = ( lastStartButtonState == false && digitalRead(Globals::GameControl::StartButton) );
+    lastStartButtonState = digitalRead(Globals::GameControl::StartButton);
+    return buttonPressed;
+}
+
+bool lastResetButtonState = false;
+bool startButtonPressed()
+{
+    bool buttonPressed = ( lastResetButtonState == false && digitalRead(Globals::GameControl::ResetButton) );
+    lastResetButtonState = digitalRead(Globals::GameControl::ResetButton);
+    return buttonPressed;
 }
