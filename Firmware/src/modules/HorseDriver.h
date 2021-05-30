@@ -22,8 +22,9 @@ public:
     /**
      * This function is called in every iteration of the main loop.
      * After a call to startMoving, this function can be used to increment stepper motors, etc 
+     * @param progress the progress this horse is supposed to make this iteration
      */
-    virtual void loopCall() = 0;
+    virtual void loopCall(float const progress) = 0;
 
     /**
      * Set the horse velocity. This should relate to the horses' motors' rpm

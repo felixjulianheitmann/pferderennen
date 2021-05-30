@@ -4,11 +4,18 @@
 // ######################################################
 
 #include <modules/HorseDriver.h>
+#include <Stepper.h>
+#include <config/globals.h>
 
 class HorseDriver_ULN2003 : HorseDriver
 {
 public:
-    HorseDriver_ULN2003(/* args */);
+
+    // default constructor
+    HorseDriver_ULN2003();
+
+    // construct with hardware configuration
+    HorseDriver_ULN2003(const Pin motorPins[4]);
 
     /**
      * A initialization function to setup motor configurations, etc. 
@@ -18,8 +25,9 @@ public:
     /**
      * This function is called in every iteration of the main loop.
      * After a call to startMoving, this function can be used to increment stepper motors, etc 
+     * @param progress the progress this horse is supposed to make this iteration
      */
-    void loopCall() override;
+    void loopCall(float const progress) override;
 
     /**
      * Set the horse velocity. This should relate to the horses' motors' rpm
@@ -67,11 +75,16 @@ public:
 
 private:
 
-    // whether movement is enabled
-    bool _enabled;
+    // Shows the horses control state
+    enum State_t {
+        Forward,
+        Reverse,
+        Stop
+    } _state;
 
     // the progress value
     float _progress;
-
-
+    
+    // stepper object to control the underlying ULN2003
+    Stepper _stepper;
 };

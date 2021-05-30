@@ -44,8 +44,30 @@ public:
      */
     void loopCall();
 
+    /**
+     * Signalize that a horse reached the starting gate
+     * If all horses arrived at starting gate, game is stopped
+     */
+    void atStartingGate(HorseIdx horse);
+
+    /**
+     * Changes the game speed
+     * @param speed the speed as a factor from 0 - 1 resulting in MinVelocity - MaxVelocity
+     */
+    void setGameSpeed(float speed);
+
+
 private:
 
-    HorseDriver_ULN2003 _horses[Globals::GameControl::nHorses];
+    enum State_t {
+        Started,
+        Stopped,
+        Resetting
+    } _state;
 
+    // The motor drivers to move the horses
+    HorseDriver_ULN2003* _horses[Globals::GameControl::nHorses];
+    
+    // Flags to signalize whether a horse is at the starting gate. Reset at race start
+    volatile bool _horseStartFlags[Globals::GameControl::nHorses] = { false };
 };

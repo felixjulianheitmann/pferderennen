@@ -7,6 +7,8 @@
 #include <config/globals.h>
 #include <modules/GameEngine.h>
 
+
+
 // ##########################################################
 // ### Function Prototypes
 // ##########################################################
@@ -14,6 +16,8 @@ void IsrFinish();
 void IsrStart();
 bool startButtonPressed();
 bool resetButtonPressed();
+void setPinModes();
+
 
 // ##########################################################
 // ### Initialize program variables
@@ -21,11 +25,7 @@ bool resetButtonPressed();
 
 auto game  = GameEngine();
 
-// Flags to signalize whether a horse is at the starting gate. Reset at race start
-volatile bool horseStartFlags[Globals::GameControl::nHorses] = { false };
 
-// Flag to signalize to finish of a race. Reset at game start.
-volatile bool finishFlag = false;
 
 // ##########################################################
 // ### Program setup
@@ -39,6 +39,9 @@ void setup() {
 
     Serial.println("# Setting up horse positions ... ");
 
+    // +++ Set pin modes
+    setPinModes();
+
     // +++ Register start and finish trigger interrupts
     attachInterrupt(digitalPinToInterrupt(Globals::GameControl::IntFinish), IsrFinish, FALLING);
     attachInterrupt(digitalPinToInterrupt(Globals::GameControl::IntStart),  IsrStart,  FALLING);
@@ -49,6 +52,7 @@ void setup() {
 }
 
 
+
 // ##########################################################
 // ### Program loop
 // ##########################################################
@@ -57,27 +61,32 @@ void loop() {
     if(startButtonPressed()) game.start();  // If start button is pressed, start the game
     if(resetButtonPressed()) game.reset();  // If reset button is pressed, reset the game
 
+    // set rpm according to potentiometer
+    auto input = analogRead(Globals::GameControl::VelocityPotentiometer) / 1023.0f;
+    game.setGameSpeed(input);
+
     // iterative call to driver to trigger periodic behaviour
     game.loopCall();
 
 }
 
 
+
 // ##########################################################
-// ### ISR Definitions
+// ### Function Definitions
 // ##########################################################
 void IsrFinish()
 {
-    finishFlag = true;
+    game.stop();
 }
 
 void IsrStart()
 {
-    for(HorseIdx i = 0; i < Globals::GameControl::nHorses; ++i)
+    for(HorseIdx idx = 0; idx < Globals::GameControl::nHorses; ++idx)
     {
-        if(digitalRead(Globals::GameControl::horseStartTriggers[i]) == LOW)
+        if(digitalRead(Globals::GameControl::horseStartTriggers[idx]) == LOW)
         {
-            horseStartFlags[i] = true;
+            game.atStartingGate(idx);
             return;
         }
     }
@@ -92,9 +101,31 @@ bool startButtonPressed()
 }
 
 bool lastResetButtonState = false;
-bool startButtonPressed()
+bool resetButtonPressed()
 {
     bool buttonPressed = ( lastResetButtonState == false && digitalRead(Globals::GameControl::ResetButton) );
     lastResetButtonState = digitalRead(Globals::GameControl::ResetButton);
     return buttonPressed;
+}
+
+void setPinModes()
+{
+    pinMode(Globals::GameControl::IntStart, INPUT_PULLUP);
+    pinMode(Globals::GameControl::IntFinish, INPUT_PULLUP);
+    pinMode(Globals::GameControl::StartButton, INPUT_PULLUP);
+    pinMode(Globals::GameControl::ResetButton, INPUT_PULLUP);
+    pinMode(Globals::GameControl::VelocityPotentiometer, INPUT);
+
+    for(auto& pin : Globals::GameControl::horseStartTriggers)
+    {
+        pinMode(pin, INPUT_PULLUP);
+    }
+
+    for(auto& pinSet : Globals::Motor::MotorPins)
+    {
+        for(auto& pin : pinSet)
+        {
+            pinMode(pin, OUTPUT);
+        }
+    }
 }
