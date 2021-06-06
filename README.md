@@ -1,5 +1,7 @@
 # Pferderennen - Horse Racing
 
+![Screenshot](Models/Screenshot.png)
+
 This small project takes an arduino and as many stepper motors as you like. The ones I used here are **28BYJ-48** with an **ULN2003** as the motor driver. Other motors should be supported by implementing the [HorseDriver.h](Firmware/src/modules/HorseDriver.h) interface.
 
 All source code is found under [Firmware](Firmware), while all 3D models as well as a technical sketch and a screenshot of the finished model reside in [Models](Models).
