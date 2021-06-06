@@ -7,15 +7,19 @@
 #include <Stepper.h>
 #include <config/globals.h>
 
-class HorseDriver_ULN2003 : HorseDriver
+class HorseDriver_ULN2003 : public HorseDriver
 {
 public:
 
     // default constructor
     HorseDriver_ULN2003();
 
-    // construct with hardware configuration
-    HorseDriver_ULN2003(const Pin motorPins[4]);
+    /**
+     * constructor with hardware configuration and motor direction
+     * @param motorPins the hardware pins connected to the motor
+     * @param dir a switch to invert motor spin direction
+     */
+    HorseDriver_ULN2003(const Pin motorPins[4], bool const dir);
 
     /**
      * A initialization function to setup motor configurations, etc. 
@@ -25,9 +29,8 @@ public:
     /**
      * This function is called in every iteration of the main loop.
      * After a call to startMoving, this function can be used to increment stepper motors, etc 
-     * @param progress the progress this horse is supposed to make this iteration
      */
-    void loopCall(float const progress) override;
+    void loopCall() override;
 
     /**
      * Set the horse velocity. This should relate to the horses' motors' rpm
@@ -35,7 +38,7 @@ public:
      * The velocity value ranges from Globals::Horse::MinVelocity to Globals::Horse::MaxVelocity
      * Game reset is always at Globals::Horse::MaxVelocity - full speed.
      */
-    void setVelocity(float const velocity) override;
+    void setVelocity(float velocity) override;
 
     /**
      * Start the horse forward movement.
@@ -58,20 +61,10 @@ public:
     void stop() override;
 
     /**
-     * This function should return some form of progress information.
-     * The precise position is not relevant. The value is used to determine the winning horse, after
-     * the finish line has been triggered.
-     * 
-     * This function might be used if there is an indication which horse won. Led stripes or something
-     * 
-     * @return float a qualitative progress value that enables horse progess comparison
+     * steps the motor one step further 
+     * @param dir the direction to step
      */
-    float getProgress() override;
-
-    /**
-     * Resets the progress value. The function is called at the game reset.
-     */
-    void resetProgress() override;
+    void step(bool const dir);
 
 private:
 
@@ -82,9 +75,18 @@ private:
         Stop
     } _state;
 
-    // the progress value
-    float _progress;
-    
-    // stepper object to control the underlying ULN2003
-    Stepper _stepper;
+    // the velocity value
+    float _velocity;
+
+    // global motor spin direction - can invert motor behaviour
+    bool _dir;
+
+    // ULN2003 pins
+    int _pins[4];
+
+    // current step
+    int _step;
+
+    // the timestamp of the last step
+    unsigned long _lastStepTime;
 };

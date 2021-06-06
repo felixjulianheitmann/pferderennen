@@ -15,39 +15,37 @@ namespace Globals {
 
     namespace GameControl {
 
-        constexpr Pin IntStart          = 2;          // Interrupt Pin for the start line trigger
-        constexpr Pin IntFinish         = 3;          // Interrupt Pin for the finish line trigger
-
-        constexpr Pin StartButton       = 4;
-        constexpr Pin ResetButton       = 5;
-
+        constexpr Pin StartButton       = 2;
+        constexpr Pin ResetButton       = 4;
+        constexpr unsigned long Debounce = 50; // Trigger debounce in ms
         constexpr unsigned int nHorses =    3;          // The number of horses in the race
-        constexpr Pin horseStartTriggers[nHorses] =     // The trigger pins to check whether a horse is at the starting gate 
+        constexpr Pin horseTriggers[nHorses] =     // The trigger pins to check whether a horse is at the starting gate 
         {
-            6,
-            7,
+            5,
+            7,  
             8,
         };
 
-        constexpr Pin VelocityPotentiometer = A7;   // A potentiometer to control game velocity
+        constexpr Pin VelocityPotentiometer = A6;   // A potentiometer to control game velocity
+
+        constexpr unsigned int VelocityChangeInterval = 500; // The interval after which the velocity of horses is reevaluated
+
     }
 
     namespace Horse {
 
-        constexpr float MinVelocity =   0.0f;       // The minimum velocity value that can be set for a horse
-        constexpr float MaxVelocity =   100.0f;     // The maximium velocity value that can be set for a horse
+        constexpr float MinVelocity =   0.25f;       // The minimum velocity value that can be set for a horse - in respect to MaxVelocity
+        constexpr float MaxVelocity =   1.00f;     // The maximium velocity value that can be set for a horse - 1 equals full speed
 
-        constexpr unsigned int MinProgress = 10;    // The minimum progress a horse should make each loop
-        constexpr unsigned int MaxProgress = 100;   // The maximum progress a horse should make each loop
+        constexpr int Progress = 1; // The progress a horse does on a reset
 
-        constexpr float ProgressOffset = 0.5;       // The initial offset from the starting trigger
+        constexpr unsigned int StartOffset = 1000; // Offset to the starting gate before race
 
     }
 
     namespace Motor {
 
-        constexpr unsigned int StepsPerRev  = 4096; // The number of steps for one revolution of the stepper motor
-        constexpr unsigned int MaxRpm       = 60;   // The maximum revolution per minute of the motor
+        constexpr unsigned long Delay        = 3000;   // The maximum revolution per minute of the motor
 
         constexpr Pin MotorPins[GameControl::nHorses][4] = {    // The hardware pins associated with each horse
             {
@@ -66,7 +64,7 @@ namespace Globals {
                 A3,
                 A4,
                 A5,
-                A6,
+                3,
             },
 
         };
@@ -74,7 +72,7 @@ namespace Globals {
         // A switch to invert the direction of each motor
         constexpr bool MotorDirections[GameControl::nHorses] = {
             true,
-            true,
+            false,
             true,
         };
 

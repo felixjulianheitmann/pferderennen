@@ -22,9 +22,8 @@ public:
     /**
      * This function is called in every iteration of the main loop.
      * After a call to startMoving, this function can be used to increment stepper motors, etc 
-     * @param progress the progress this horse is supposed to make this iteration
      */
-    virtual void loopCall(float const progress) = 0;
+    virtual void loopCall() = 0;
 
     /**
      * Set the horse velocity. This should relate to the horses' motors' rpm
@@ -32,7 +31,7 @@ public:
      * The velocity value ranges from Globals::Horse::MinVelocity to Globals::Horse::MaxVelocity
      * Game reset is always at Globals::Horse::MaxVelocity - full speed.
      */
-    virtual void setVelocity(float const velocity) = 0;
+    virtual void setVelocity(float velocity) = 0;
 
     /**
      * Start the horse forward movement.
@@ -53,21 +52,5 @@ public:
      * This function should disable the horses' ability to move. 
      */
     virtual void stop() = 0;
-
-    /**
-     * This function should return some form of progress information.
-     * The precise position is not relevant. The value is used to determine the winning horse, after
-     * the finish line has been triggered.
-     * 
-     * This function might be used if there is an indication which horse won. Led stripes or something
-     * 
-     * @return float a qualitative progress value that enables horse progess comparison
-     */
-    virtual float getProgress() = 0;
-
-    /**
-     * Resets the progress value. The function is called at the game reset.
-     */
-    virtual void resetProgress() = 0;
 
 };

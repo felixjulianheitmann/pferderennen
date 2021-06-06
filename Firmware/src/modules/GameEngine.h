@@ -12,8 +12,6 @@ public:
 
     /**
      * @brief GameEngine Constructor
-     * 
-     * 
      */
     GameEngine();
 
@@ -28,15 +26,9 @@ public:
     void start();
 
     /**
-     * Stops the game. Further calls to loopCall() will not cause progress 
+     * Stops the game. Further calls to loopCall() will not cause progress
      */
     void stop();
-
-    /**
-     * Returns the HorseIdx with the maximum progress
-     * @return HorseIdx index of the currently winning horse
-     */
-    HorseIdx getWinner();
 
     /**
      * Function that gets called every main loop iteration
@@ -48,7 +40,7 @@ public:
      * Signalize that a horse reached the starting gate
      * If all horses arrived at starting gate, game is stopped
      */
-    void atStartingGate(HorseIdx horse);
+    void triggerHorse(HorseIdx horse);
 
     /**
      * Changes the game speed
@@ -65,9 +57,17 @@ private:
         Resetting
     } _state;
 
+public:
     // The motor drivers to move the horses
-    HorseDriver_ULN2003* _horses[Globals::GameControl::nHorses];
-    
+    HorseDriver* _horses[Globals::GameControl::nHorses];
+
+private:
     // Flags to signalize whether a horse is at the starting gate. Reset at race start
-    volatile bool _horseStartFlags[Globals::GameControl::nHorses] = { false };
+    bool _horseStartFlags[Globals::GameControl::nHorses] = { false };
+
+    unsigned long _horseTriggerDebouce[Globals::GameControl::nHorses];
+
+    // Horse velocity changer time interval
+    unsigned long _lastVelChange;
+    
 };
