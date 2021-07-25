@@ -80,14 +80,14 @@ void loop() {
 bool startButtonPressed()
 {
     // randomSeed(micros());
-    bool buttonPressed = ( lastStartButtonState == true && digitalRead(Globals::GameControl::StartButton) == false );
+    bool buttonPressed = ( lastStartButtonState && !digitalRead(Globals::GameControl::StartButton) );
     lastStartButtonState = digitalRead(Globals::GameControl::StartButton);
     return buttonPressed;
 }
 
 bool resetButtonPressed()
 {
-    bool buttonPressed = ( lastResetButtonState == true && digitalRead(Globals::GameControl::ResetButton) == false );
+    bool buttonPressed = ( lastResetButtonState && !digitalRead(Globals::GameControl::ResetButton) );
     lastResetButtonState = digitalRead(Globals::GameControl::ResetButton);
     return buttonPressed;
 }
@@ -95,7 +95,7 @@ bool resetButtonPressed()
 bool horseTriggered(HorseIdx idx) 
 {
     bool now = (digitalRead(Globals::GameControl::horseTriggers[idx]));
-    bool triggered = ( lastTriggerState[idx] == true && now == false );
+    bool triggered = ( lastTriggerState[idx] && !now );
     lastTriggerState[idx] = now;
     return triggered;
 }

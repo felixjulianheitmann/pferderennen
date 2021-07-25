@@ -19,7 +19,7 @@ namespace Globals {
         constexpr Pin ResetButton       = 4;
         constexpr unsigned long Debounce = 50; // Trigger debounce in ms
         constexpr unsigned int nHorses =    3;          // The number of horses in the race
-        constexpr Pin horseTriggers[nHorses] =     // The trigger pins to check whether a horse is at the starting gate 
+        constexpr Pin horseTriggers[nHorses] =     // The trigger pins to check whether a horse is at the starting gate - connected to horses
         {
             5,
             7,  
@@ -34,10 +34,8 @@ namespace Globals {
 
     namespace Horse {
 
-        constexpr float MinVelocity =   0.25f;       // The minimum velocity value that can be set for a horse - in respect to MaxVelocity
+        constexpr float MinVelocity =   0.10f;       // The minimum velocity value that can be set for a horse - in respect to MaxVelocity
         constexpr float MaxVelocity =   1.00f;     // The maximium velocity value that can be set for a horse - 1 equals full speed
-
-        constexpr int Progress = 1; // The progress a horse does on a reset
 
         constexpr unsigned int StartOffset = 1000; // Offset to the starting gate before race
 
@@ -71,9 +69,9 @@ namespace Globals {
 
         // A switch to invert the direction of each motor
         constexpr bool MotorDirections[GameControl::nHorses] = {
-            true,
             false,
-            true,
+            false,
+            false,
         };
 
     }
